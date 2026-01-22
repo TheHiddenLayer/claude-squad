@@ -206,14 +206,14 @@ func (m *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				continue
 			}
 			updated, prompt := instance.HasUpdated()
-			if updated {
+			// Check for prompt first - tap enter regardless of whether
+			// the screen is still updating (animations can cause continuous updates)
+			if prompt {
+				instance.TapEnter()
+			} else if updated {
 				instance.SetStatus(session.Running)
 			} else {
-				if prompt {
-					instance.TapEnter()
-				} else {
-					instance.SetStatus(session.Ready)
-				}
+				instance.SetStatus(session.Ready)
 			}
 			if err := instance.UpdateDiffStats(); err != nil {
 				log.WarningLog.Printf("could not update diff stats: %v", err)
